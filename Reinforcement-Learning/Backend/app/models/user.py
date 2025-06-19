@@ -31,9 +31,6 @@ class User(Base):
     last_login_at = Column(DateTime, nullable=True)
 
 
-
-
-
 class PendingRegistration(Base):
     __tablename__ = "pending_registrations"
     
@@ -60,11 +57,21 @@ class PendingRegistration(Base):
     
     def is_expired(self) -> bool:
         """Check if verification token has expired"""
-        return datetime.now(timezone.utc) > self.expires_at
+        # Fix: Make both datetimes timezone-aware for comparison
+        current_time = datetime.now(timezone.utc)
+        
+        # If expires_at is timezone-naive, make it UTC-aware
+        if self.expires_at.tzinfo is None:
+            expires_at_utc = self.expires_at.replace(tzinfo=timezone.utc)
+        else:
+            expires_at_utc = self.expires_at
+            
+        return current_time > expires_at_utc
     
     def is_valid(self) -> bool:
         """Check if token is valid (not used and not expired)"""
         return not self.is_used and not self.is_expired()
+
 
 class UserUsage(Base):
     __tablename__ = "user_usage"

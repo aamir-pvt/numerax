@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     PRO_TIER_MONTHLY_ANALYSES: int = -1  # -1 = unlimited
     PRO_TIER_MONTHLY_TRAININGS: int = -1  # -1 = unlimited
 
+    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "your-super-secret-jwt-key-change-in-production")
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()

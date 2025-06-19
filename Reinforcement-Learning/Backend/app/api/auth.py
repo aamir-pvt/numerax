@@ -3,14 +3,16 @@ from sqlalchemy.orm import Session
 from app.schemas.user import (
     VerificationRequest, VerificationRequestResponse, 
     EmailVerificationRequest, EmailVerificationResponse, 
-    ResendVerificationRequest, UserResponse
+    ResendVerificationRequest, UserResponse,
+    UserLoginRequest, LoginResponse  # ← Added these imports
 )
 from app.services.verification_service import (
     request_email_verification, 
     verify_email_and_create_user, 
     resend_verification_email
 )
-from app.api.deps import db_dependency
+from app.services.user_service import login_user  # ← Added this import
+from app.api.deps import db_dependency, get_current_user  # ← Added get_current_user
 
 # Create router for authentication endpoints
 router = APIRouter(
@@ -19,6 +21,9 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+# ==========================================
+# EXISTING REGISTRATION ENDPOINTS
+# ==========================================
 
 @router.post(
     "/request-verification",
@@ -102,6 +107,68 @@ async def resend_verification(
     result = await resend_verification_email(resend_data.email, db)
     return result
 
+# ==========================================
+# 🆕 NEW LOGIN ENDPOINTS
+# ==========================================
+
+@router.post(
+    "/login",
+    response_model=LoginResponse,
+    status_code=status.HTTP_200_OK,
+    summary="User Login",
+    description="Authenticate user with email and password, returns JWT access token"
+)
+async def login(
+    login_data: UserLoginRequest,
+    db: Session = db_dependency
+):
+    """
+    Authenticate user and return JWT access token.
+    
+    - **email**: Verified email address
+    - **password**: User's password
+    
+    Returns:
+    - **access_token**: JWT token for authenticated requests
+    - **token_type**: Bearer token type
+    - **expires_in**: Token expiration time in seconds
+    - **user**: User profile information
+    
+    The token must be included in Authorization header for protected endpoints:
+    `Authorization: Bearer <your-token>`
+    """
+    
+    result = await login_user(login_data, db)
+    return result
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get Current User Profile",
+    description="Get current authenticated user's profile information"
+)
+async def get_current_user_profile(
+    current_user = Depends(get_current_user)
+):
+    """
+    Get current user's profile information.
+    
+    **Requires Authentication**: Include JWT token in Authorization header:
+    `Authorization: Bearer <your-jwt-token>`
+    
+    Returns complete user profile including:
+    - User ID and email
+    - Name and company information
+    - Account status and membership tier
+    - Account creation date
+    """
+    return current_user
+
+# ==========================================
+# HEALTH CHECK
+# ==========================================
 
 @router.get(
     "/health",
@@ -113,10 +180,12 @@ async def auth_health_check():
     return {
         "status": "healthy",
         "service": "authentication",
-        "message": "Auth service with email verification is running properly",
+        "message": "Auth service with email verification and login is running properly",
         "available_endpoints": [
-            "/auth/request-verification",
-            "/auth/verify-email",
-            "/auth/resend-verification"
+            "POST /auth/request-verification",
+            "GET /auth/verify-email",
+            "POST /auth/resend-verification",
+            "POST /auth/login",  # ← Added
+            "GET /auth/me"       # ← Added
         ]
     }

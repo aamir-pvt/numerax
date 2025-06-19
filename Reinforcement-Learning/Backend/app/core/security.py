@@ -3,6 +3,8 @@ from typing import Optional
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from app.core.settings import get_settings
+from fastapi import HTTPException, status
+
 
 settings = get_settings()
 
@@ -48,3 +50,13 @@ def verify_token(token: str) -> Optional[dict]:
         return payload
     except JWTError:
         return None
+    
+
+def get_user_id_from_token(token: str) -> Optional[int]:
+    """Extract user ID from JWT token"""
+    payload = verify_token(token)
+    if payload:
+        user_id: str = payload.get("sub")
+        if user_id:
+            return int(user_id)
+    return None

@@ -79,3 +79,21 @@ class EmailVerificationResponse(BaseModel):
 # Resend verification request
 class ResendVerificationRequest(BaseModel):
     email: EmailStr
+
+
+# Add these to your existing schemas
+
+class UserLoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
+    user: UserResponse
+
+class LoginResponse(BaseModel):
+    success: bool
+    message: str
+    data: TokenResponse

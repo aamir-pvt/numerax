@@ -1,8 +1,8 @@
-from typing import Generator
+from typing import Generator, Optional
 from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer
 from sqlalchemy.orm import Session
 from app.db.database import get_db
-
 
 def get_database() -> Generator[Session, None, None]:
     """
@@ -17,19 +17,60 @@ def get_database() -> Generator[Session, None, None]:
     finally:
         pass
 
-
-class DatabaseDependency:
-    """Database session dependency class"""
-    
-    @staticmethod
-    def get_session() -> Generator[Session, None, None]:
-        """Get database session generator"""
-        return get_database()
-
-
 # Common database dependency
 db_dependency = Depends(get_database)
 
+# Security scheme for JWT tokens
+security = HTTPBearer()
+
+async def get_current_user(
+    token: str = Depends(security),
+    db: Session = db_dependency
+) -> "User":
+    """
+    Get current authenticated user from JWT token
+    
+    Args:
+        token: JWT token from Authorization header
+        db: Database session
+        
+    Returns:
+        User: Current authenticated user
+        
+    Raises:
+        HTTPException: If token is invalid or user not found
+    """
+    from app.core.security import get_user_id_from_token
+    from app.services.user_service import get_user_by_id
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        # Extract user ID from token
+        user_id = get_user_id_from_token(token.credentials)
+        if user_id is None:
+            raise credentials_exception
+            
+    except Exception:
+        raise credentials_exception
+    
+    # Get user from database
+    user = get_user_by_id(user_id, db)
+    if user is None:
+        raise credentials_exception
+        
+    # Check if user is still active
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account deactivated"
+        )
+    
+    return user
 
 # Error handling utilities
 class APIError:
@@ -90,7 +131,6 @@ class APIError:
             detail=f"{field}: {message}"
         )
 
-
 # Request validation helpers
 class RequestValidator:
     """Request validation utilities"""
@@ -150,7 +190,6 @@ class RequestValidator:
             return False, f"{field_name} must be less than 100 characters"
         
         return True, ""
-
 
 # Response utilities
 class ResponseFormatter:

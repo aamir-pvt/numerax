@@ -30,18 +30,47 @@ class TokenGenerator:
             hours: Hours until token expires (default 24)
             
         Returns:
-            tuple: (token, expiration_datetime)
+            tuple: (token, expiration_datetime) - both timezone-aware
         """
         token = TokenGenerator.generate_verification_token()
+        # Fix: Always use timezone-aware datetime
         expires_at = datetime.now(timezone.utc) + timedelta(hours=hours)
         return token, expires_at
     
     @staticmethod
     def is_token_expired(expires_at: datetime) -> bool:
-        """Check if token has expired"""
-        return datetime.now(timezone.utc) > expires_at
+        """
+        Check if token has expired
+        
+        Args:
+            expires_at: Expiration datetime (can be naive or aware)
+            
+        Returns:
+            bool: True if expired
+        """
+        current_time = datetime.now(timezone.utc)
+        
+        # Handle timezone-naive datetimes by assuming UTC
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+        return current_time > expires_at
     
     @staticmethod
     def time_until_expiry(expires_at: datetime) -> timedelta:
-        """Get time remaining until token expires"""
-        return expires_at - datetime.now(timezone.utc)
+        """
+        Get time remaining until token expires
+        
+        Args:
+            expires_at: Expiration datetime
+            
+        Returns:
+            timedelta: Time remaining (negative if expired)
+        """
+        current_time = datetime.now(timezone.utc)
+        
+        # Handle timezone-naive datetimes
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+            
+        return expires_at - current_time
