@@ -1,0 +1,106 @@
+* {
+  margin: 0px;
+}
+
+html {
+  font-family: "Teko", sans-serif;
+}
+
+.element {
+  float: right;
+}
+
+.Border {
+  border-style: solid;
+  border-width: 2px;
+  width: 25rem;
+}
+
+.Dashboard-Stock {
+  color: #eeecda;
+  background-color: #0f3057;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.tables {
+  float: left;
+  font-size: 12px;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+thead {
+  background-color: #91d18b;
+}
+th {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+td {
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: small;
+  padding-bottom: 0.3rem;
+  padding-top: 0.3rem;
+}
+
+.Page {
+  position: relative;
+  padding: 1rem 0rem 1rem 1rem;
+}
+
+.move {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.filterTweak {
+  padding: 0.3rem;
+  margin: 0rem 0.3rem;
+}
+
+input {
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+
+button:focus {
+  outline: none;
+}
+
+.search {
+  margin: 1rem 0rem;
+}
+
+.spinner-1:before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 60px;
+  width: 60px;
+  margin-top: -30;
+  margin-left: -30px;
+  border-radius: 50%;
+  border: 3px solid lightgray;
+  border-top-color: coral;
+  animation: spinner 0.7s linear infinite;
+}
+
+.dashBoard {
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

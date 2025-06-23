@@ -1,0 +1,9 @@
+{
+    "name": "backend-application",
+    "version": "0.0.1",
+    "dependencies": [
+        "eigen3",
+        "quantlib",
+        "node-addon-api"
+    ]
+}

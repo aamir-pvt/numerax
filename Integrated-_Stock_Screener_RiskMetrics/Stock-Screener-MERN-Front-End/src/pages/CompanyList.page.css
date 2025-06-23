@@ -1,0 +1,41 @@
+.full-container {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.flexBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.pagination {
+  float: right;
+}
+
+.table {
+  background-color: white;
+}
+
+tbody tr:nth-of-type(odd) {
+  background-color: #f3f2f8;
+}
+
+.two-line {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.long-company-name {
+  white-space: pre-wrap;
+}
+
+.crypto-table {
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+.crypto-row {
+  padding: 10px 0; /* Adjust the vertical spacing between rows as needed */
+}
