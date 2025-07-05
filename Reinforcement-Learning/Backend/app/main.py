@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth
+from app.api import portfolio
 from app.core.settings import get_settings
 
 # Get application settings
@@ -15,10 +16,14 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Add CORS middleware for frontend integration
+# Add CORS middleware for frontend + Swagger UI integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8080"],  # Add your frontend URLs
+    allow_origins=[
+        "http://localhost:3000",  # React/Vite dev frontend
+        "http://localhost:8080",  # Alternate frontend port
+        "http://localhost:8000",  # Swagger UI runs from here
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -26,6 +31,7 @@ app.add_middleware(
 
 # Include API routers
 app.include_router(auth.router, prefix="/api")
+app.include_router(portfolio.router, prefix="/api")
 
 # Root endpoint
 @app.get("/")

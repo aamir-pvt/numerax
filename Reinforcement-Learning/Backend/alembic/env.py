@@ -5,7 +5,7 @@ from alembic import context
 
 # Import your Base and models
 from app.db.database import Base
-from app.models import user  # Import all model files here
+from app.models import user, portfolio
 
 # Import settings
 from app.core.settings import get_settings
