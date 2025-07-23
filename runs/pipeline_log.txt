@@ -1,0 +1,4 @@
+2025-03-18 23:43:24 - 📂 Uploaded stock data file: company.xlsx, 14 rows loaded.
+2025-03-18 23:44:22 - 🚀 Pipeline started.
+2025-03-18 23:44:22 - 📂 Preparing data...
+2025-03-18 23:44:22 - ❌ ERROR: 'date'
